@@ -24,14 +24,28 @@ def dashboard():
     conn = sqlite3.connect("harvestiq.db")
     cursor = conn.cursor()
 
+    # Total Crops
     cursor.execute("SELECT COUNT(*) FROM crops")
     total_crops = cursor.fetchone()[0]
+
+    # Total Yield
+    cursor.execute("SELECT SUM(yield_amount) FROM crops")
+    total_yield = cursor.fetchone()[0]
+
+    if total_yield is None:
+        total_yield = 0
+
+    # Total Locations
+    cursor.execute("SELECT COUNT(DISTINCT location) FROM crops")
+    total_locations = cursor.fetchone()[0]
 
     conn.close()
 
     return render_template(
         "dashboard.html",
-        total_crops=total_crops
+        total_crops=total_crops,
+        total_yield=total_yield,
+        total_locations=total_locations
     )
 
 @app.route("/add-crop", methods=["GET", "POST"])
@@ -148,6 +162,34 @@ def edit_crop(id):
         "edit_crop.html",
         crop=crop
     )
+
+@app.route("/reports")
+def reports():
+
+    conn = sqlite3.connect("harvestiq.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM crops")
+    total_crops = cursor.fetchone()[0]
+
+    cursor.execute("SELECT SUM(yield_amount) FROM crops")
+    total_yield = cursor.fetchone()[0]
+
+    if total_yield is None:
+        total_yield = 0
+
+    cursor.execute("SELECT COUNT(DISTINCT location) FROM crops")
+    total_locations = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+        "reports.html",
+        total_crops=total_crops,
+        total_yield=total_yield,
+        total_locations=total_locations
+    )
+
 
 
 if __name__ == "__main__":
