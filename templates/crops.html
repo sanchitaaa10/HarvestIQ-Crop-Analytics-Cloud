@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Crops</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        h1 {
+            color: green;
+        }
+
+        a {
+            text-decoration: none;
+            margin-right: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .edit-btn {
+            color: blue;
+            font-weight: bold;
+        }
+
+        .delete-btn {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Crop Records</h1>
+
+    <a href="/dashboard">Dashboard</a>
+    <a href="/add-crop">Add Crop</a>
+
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Crop Name</th>
+            <th>Location</th>
+            <th>Yield</th>
+            <th>Action</th>
+        </tr>
+
+        {% for crop in crops %}
+        <tr>
+            <td>{{ crop[0] }}</td>
+            <td>{{ crop[1] }}</td>
+            <td>{{ crop[2] }}</td>
+            <td>{{ crop[3] }}</td>
+
+            <td>
+                <a href="/edit/{{ crop[0] }}" class="edit-btn">
+                    Edit
+                </a>
+
+                |
+
+                <a href="/delete/{{ crop[0] }}" class="delete-btn">
+                    Delete
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</body>
+</html>

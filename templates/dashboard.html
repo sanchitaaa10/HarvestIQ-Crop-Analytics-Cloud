@@ -1,37 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>HarvestIQ Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Dashboard</title>
 </head>
 <body>
 
-<div class="container">
+<h1>HarvestIQ Dashboard</h1>
 
-    <div class="header">
-        <h1>HarvestIQ Dashboard</h1>
-    </div>
+<h2>Total Crops: {{ total_crops }}</h2>
 
-    <div class="card-container">
-
-        <div class="card">
-            <h2>120</h2>
-            <p>Total Crops</p>
-        </div>
-
-        <div class="card">
-            <h2>25</h2>
-            <p>Reports</p>
-        </div>
-
-        <div class="card">
-            <h2>15</h2>
-            <p>Users</p>
-        </div>
-
-    </div>
-
-</div>
+<ul>
+    <li><a href="/add-crop">Add Crop</a></li>
+    <li><a href="/crops">View Crops</a></li>
+</ul>
 
 </body>
 </html>
