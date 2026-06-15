@@ -1,12 +1,32 @@
 import boto3
-from flask import request
-import sqlite3
+import pymysql
 from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
-s3 = boto3.client('s3')
 
+# =========================
+# S3 Configuration
+# =========================
+
+s3 = boto3.client('s3')
 BUCKET_NAME = "harvestiq-sanchita-2026"
+
+# =========================
+# MySQL Connection
+# =========================
+
+def get_connection():
+    return pymysql.connect(
+        host="harvestiq-db.cduao8yi8dwl.ap-south-1.rds.amazonaws.com",
+        user="admin",
+        password="YOUR_RDS_PASSWORD",
+        database="harvestiq"
+    )
+
+# =========================
+# File Upload to S3
+# =========================
+
 @app.route("/upload", methods=["GET", "POST"])
 def upload_file():
 
@@ -20,16 +40,18 @@ def upload_file():
             file.filename
         )
 
-        return "Uploaded Successfully"
+        return "Uploaded Successfully!"
 
     return """
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="file">
-        <button type="submit">
-            Upload
-        </button>
+        <button type="submit">Upload</button>
     </form>
     """
+
+# =========================
+# Login
+# =========================
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -46,24 +68,25 @@ def login():
 
     return render_template("login.html")
 
+# =========================
+# Dashboard
+# =========================
+
 @app.route("/dashboard")
 def dashboard():
 
-    conn = sqlite3.connect("harvestiq.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
-    # Total Crops
     cursor.execute("SELECT COUNT(*) FROM crops")
     total_crops = cursor.fetchone()[0]
 
-    # Total Yield
     cursor.execute("SELECT SUM(yield_amount) FROM crops")
     total_yield = cursor.fetchone()[0]
 
     if total_yield is None:
         total_yield = 0
 
-    # Total Locations
     cursor.execute("SELECT COUNT(DISTINCT location) FROM crops")
     total_locations = cursor.fetchone()[0]
 
@@ -76,6 +99,10 @@ def dashboard():
         total_locations=total_locations
     )
 
+# =========================
+# Add Crop
+# =========================
+
 @app.route("/add-crop", methods=["GET", "POST"])
 def add_crop():
 
@@ -85,13 +112,13 @@ def add_crop():
         location = request.form["location"]
         yield_amount = request.form["yield_amount"]
 
-        conn = sqlite3.connect("harvestiq.db")
+        conn = get_connection()
         cursor = conn.cursor()
 
         cursor.execute("""
-        INSERT INTO crops
-        (crop_name, location, yield_amount)
-        VALUES (?, ?, ?)
+            INSERT INTO crops
+            (crop_name, location, yield_amount)
+            VALUES (%s, %s, %s)
         """, (crop_name, location, yield_amount))
 
         conn.commit()
@@ -101,25 +128,14 @@ def add_crop():
 
     return render_template("add_crop.html")
 
-@app.route("/test")
-def test():
-
-    conn = sqlite3.connect("harvestiq.db")
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT * FROM crops")
-
-    data = cursor.fetchall()
-
-    conn.close()
-
-    return str(data)
-
+# =========================
+# View Crops
+# =========================
 
 @app.route("/crops")
 def view_crops():
 
-    conn = sqlite3.connect("harvestiq.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM crops")
@@ -131,14 +147,19 @@ def view_crops():
         "crops.html",
         crops=crops
     )
+
+# =========================
+# Delete Crop
+# =========================
+
 @app.route("/delete/<int:id>")
 def delete_crop(id):
 
-    conn = sqlite3.connect("harvestiq.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
-        "DELETE FROM crops WHERE id=?",
+        "DELETE FROM crops WHERE id=%s",
         (id,)
     )
 
@@ -147,10 +168,14 @@ def delete_crop(id):
 
     return redirect("/crops")
 
+# =========================
+# Edit Crop
+# =========================
+
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
 def edit_crop(id):
 
-    conn = sqlite3.connect("harvestiq.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     if request.method == "POST":
@@ -160,11 +185,11 @@ def edit_crop(id):
         yield_amount = request.form["yield_amount"]
 
         cursor.execute("""
-        UPDATE crops
-        SET crop_name=?,
-            location=?,
-            yield_amount=?
-        WHERE id=?
+            UPDATE crops
+            SET crop_name=%s,
+                location=%s,
+                yield_amount=%s
+            WHERE id=%s
         """, (
             crop_name,
             location,
@@ -178,7 +203,7 @@ def edit_crop(id):
         return redirect("/crops")
 
     cursor.execute(
-        "SELECT * FROM crops WHERE id=?",
+        "SELECT * FROM crops WHERE id=%s",
         (id,)
     )
 
@@ -191,10 +216,14 @@ def edit_crop(id):
         crop=crop
     )
 
+# =========================
+# Reports
+# =========================
+
 @app.route("/reports")
 def reports():
 
-    conn = sqlite3.connect("harvestiq.db")
+    conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM crops")
@@ -218,7 +247,26 @@ def reports():
         total_locations=total_locations
     )
 
+# =========================
+# Test Route
+# =========================
 
+@app.route("/test")
+def test():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM crops")
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return str(data)
+
+# =========================
+# Main
+# =========================
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
