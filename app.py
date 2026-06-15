@@ -1,7 +1,35 @@
+import boto3
+from flask import request
 import sqlite3
 from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
+s3 = boto3.client('s3')
+
+BUCKET_NAME = "harvestiq-sanchita-2026"
+@app.route("/upload", methods=["GET", "POST"])
+def upload_file():
+
+    if request.method == "POST":
+
+        file = request.files["file"]
+
+        s3.upload_fileobj(
+            file,
+            BUCKET_NAME,
+            file.filename
+        )
+
+        return "Uploaded Successfully"
+
+    return """
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="file">
+        <button type="submit">
+            Upload
+        </button>
+    </form>
+    """
 
 @app.route("/", methods=["GET", "POST"])
 def login():
