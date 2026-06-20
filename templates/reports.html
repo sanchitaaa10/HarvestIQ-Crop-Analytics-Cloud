@@ -17,19 +17,24 @@
 
 <div class="main-content">
 
-    <div class="header">
-        <h1>HarvestIQ Reports</h1>
+    <div class="card-container">
+
+    <div class="card">
+        <h2>{{ total_crops }}</h2>
+        <p>Total Crops</p>
     </div>
 
-    <div style="padding:30px;">
-
-        <h2>Summary Report</h2>
-
-        <p>Total Crops: {{ total_crops }}</p>
-        <p>Total Yield: {{ total_yield }}</p>
-        <p>Total Locations: {{ total_locations }}</p>
-
+    <div class="card">
+        <h2>{{ total_locations }}</h2>
+        <p>Total Locations</p>
     </div>
+
+    <div class="card">
+        <h2>{{ total_yield }}</h2>
+        <p>Total Yield</p>
+    </div>
+
+</div>
 
 </div>
 

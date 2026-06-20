@@ -2,36 +2,56 @@
 <html>
 <head>
     <title>Edit Crop</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
 
-<h1>Edit Crop</h1>
+<div class="sidebar">
+    <h2>HarvestIQ</h2>
 
-<form method="POST">
+    <a href="/dashboard">Dashboard</a>
+    <a href="/add-crop">Add Crop</a>
+    <a href="/crops">View Crops</a>
+    <a href="/reports">Reports</a>
+</div>
 
-    <input type="text"
-           name="crop_name"
-           value="{{ crop[1] }}"
-           required>
-    <br><br>
+<div class="main-content">
 
-    <input type="text"
-           name="location"
-           value="{{ crop[2] }}"
-           required>
-    <br><br>
+    <div class="header">
+        <h1>Edit Crop Record</h1>
+    </div>
 
-    <input type="number"
-           name="yield_amount"
-           value="{{ crop[3] }}"
-           required>
-    <br><br>
+    <div class="form-container">
 
-    <button type="submit">
-        Update Crop
-    </button>
+        <form method="POST">
 
-</form>
+            <input type="text"
+                   name="crop_name"
+                   value="{{ crop[1] }}"
+                   required>
+
+            <input type="text"
+                   name="location"
+                   value="{{ crop[2] }}"
+                   required>
+
+            <input type="number"
+                   name="yield_amount"
+                   value="{{ crop[3] }}"
+                   required>
+
+            <button type="submit">
+                Update Crop
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
 
 </body>
 </html>

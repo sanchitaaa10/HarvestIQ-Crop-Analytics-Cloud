@@ -19,7 +19,7 @@ def get_connection():
     return pymysql.connect(
         host="harvestiq-db.cduao8yi8dwl.ap-south-1.rds.amazonaws.com",
         user="admin",
-        password="YOUR_RDS_PASSWORD",
+        password="Admin123",
         database="harvestiq"
     )
 
